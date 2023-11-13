@@ -3,6 +3,15 @@
     "development"
   ],
   "hints": {
+<<<<<<< HEAD
     "no-inline-styles": "off"
+=======
+    "axe/forms": [
+      "default",
+      {
+        "label": "off"
+      }
+    ]
+>>>>>>> registro
   }
 }
