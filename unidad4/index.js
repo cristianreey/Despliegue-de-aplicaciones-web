@@ -25,14 +25,14 @@ app.listen(port, () => {
 // (temporal hasta incorporar una base de datos)
 let concesionarios = [
   {
-    nombre: "Bahiamocion",
-    direccion: "C/ FOntaneros Nº4",
-    coches: "Seat Leon, Cupra Formentor, Seat Arona, AUDI A6 50 TDI",
+    nombre: "Malaga Motor",
+    direccion: "C/ pepe garcia Nº4",
+    coches: "Seat Cordoba, Cupra FR, Seat Ibiza, AUDI A7",
   },
   {
-    nombre: "Puerto Motor",
-    direccion: "Calle Estuario 14 Poligono Industrial Las Salinas",
-    coches: "BMW Serie 4 M4 Cabrio, Chevrolet Corvette C7, LAMBORGHINI Huracán",
+    nombre: "Hyundai Motor",
+    direccion: "Calle San Fernando 14",
+    coches: "BMW M5 Competicion, Nissan Gtr R34, Mercedes AMG",
   },
 ];
 
