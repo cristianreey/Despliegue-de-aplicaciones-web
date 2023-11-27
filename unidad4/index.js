@@ -22,10 +22,7 @@ async function main() {
   await client.connect();
   console.log("Connected successfully to server");
   const db = client.db(dbName);
-  const collection = db.collection("documents");
-
-  // the following code examples can be pasted here...
-
+  const collection = db.collection("concesionario");
   return "done.";
 }
 
