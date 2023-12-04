@@ -8,28 +8,10 @@
 // Importamos las bibliotecas necesarias.
 // Concretamente el framework express.
 const express = require("express");
-const { MongoClient } = require("mongodb");
+const mongoose = require("mongoose");
 
-// Connection URL
-const url = "mongodb://localhost:27017";
-const client = new MongoClient(url);
-
-// Database Name
-const dbName = "Concesionario";
-
-async function main() {
-  // Use connect method to connect to the server
-  await client.connect();
-  console.log("Connected successfully to server");
-  const db = client.db(dbName);
-  const collection = db.collection("concesionario");
-  return "done.";
-}
-
-main()
-  .then(console.log)
-  .catch(console.error)
-  .finally(() => client.close());
+const dataBase = require("./dataBase");
+const concesionarioColletion = require("./models/concesionarios");
 
 // Inicializamos la aplicación
 const app = express();
@@ -47,7 +29,8 @@ app.listen(port, () => {
 
 // Definimos una estructura de datos
 // (temporal hasta incorporar una base de datos)
-let concesionarios = [
+dataBase();
+/**let concesionarios = [
   {
     nombre: "Hyunday Motor",
     direccion: "C/ locos Nº4",
@@ -58,95 +41,147 @@ let concesionarios = [
     direccion: "Calle Pepito 14 Poligono Industrial Malaga",
     coches: "Tesla Model, Audi Q5, Ford F-150, Mercedes-Benz E-Class",
   },
-];
+];*/
 
 // Lista todos los concesionarios
 app.get("/concesionarios", (request, response) => {
-  response.json(concesionarios);
+  concesionariosSchema
+    .find()
+    .then((data) => response.json(data))
+    .catch((error) => response.json({ message: error }));
 });
 
 // Añadir un nuevo concesionarios
 app.post("/concesionarios", (request, response) => {
-  concesionarios.push(request.body);
-  response.json({ message: "ok" });
+  const concesionario = concesionariosSchema(request.body);
+  concesionario
+    .save()
+    .then((data) => response.json(data))
+    .catch((error) => response.json({ message: error }));
 });
 
 // Obtener un solo concesionarios
 app.get("/concesionarios/:id", (request, response) => {
   const id = request.params.id;
-  const result = concesionarios[id];
-  response.json({ result });
+  concesionariosSchema
+    .findById(id)
+    .then((data) => response.json(data))
+    .catch((error) => response.json({ message: error }));
 });
 
 // Actualizar un solo concesionarios
 app.put("/concesionarios/:id", (request, response) => {
   const id = request.params.id;
-  concesionarios[id] = request.body;
-  response.json({ message: "ok" });
+  const { nombre, direccion, coches } = request.body;
+  concesionariosSchema
+    .updateOne({ _id: id }, { $set: { nombre, direccion, coches } })
+    .then((data) => response.json(data))
+    .catch((error) => response.json({ message: error }));
 });
 
 // Borrar un elemento del array
 app.delete("/concesionarios/:id", (request, response) => {
   const id = request.params.id;
-  concesionarios = concesionarios.filter((item, index) => index != id);
-  response.json({ message: "ok" });
+  concesionariosSchema
+    .deleteOne({ _id: id })
+    .then((data) => response.json(data))
+    .catch((error) => response.json({ message: error }));
 });
 
 // Obtener todos los coches de un concesionarios por id
 app.get("/concesionarios/:id/coches", (request, response) => {
   const id = request.params.id;
-  const concesionarioConcreto = concesionarios[id];
 
-  const result = concesionarioConcreto.coches.split(",").map((coches) => coches.trim());
-  response.json({ result });
+  concesionariosSchema
+    .findById(id)
+    .then((concesionario) => {
+      response.json({ coches: concesionario.coches });
+    })
+    .catch((error) => response.json({ message: error }));
 });
 
-// Añadir un nuevo coche al concesionarios
+// Añadir un nuevo coche al concesionario
 app.post("/concesionarios/:id/coches", (request, response) => {
   const id = request.params.id;
-  const concesionarioConcreto = concesionarios[id];
+  const { coches: cochesToAdd } = request.body;
 
-  concesionarioConcreto.coches += `, ${request.body.coches}`;
-  response.json({ message: "ok" });
+  concesionariosSchema
+    .findById(id)
+    .then((concesionario) => {
+      if (!concesionario) {
+        return response.status(404).json({ message: "Concesionario no encontrado" });
+      }
+
+      // Convertir la cadena de coches existente a un array
+      const cochesArray = concesionario.coches.split(",").map((coche) => coche.trim());
+
+      // Agregar los nuevos coches al array existente
+      cochesArray.push(...cochesToAdd.split(","));
+
+      // Convertir el array de coches de nuevo a una cadena
+      concesionario.coches = cochesArray.join(", ");
+
+      return concesionario.save();
+    })
+    .then((data) => response.json(data))
+    .catch((error) => response.status(500).json({ message: error }));
 });
 
-// Obtiene el coche cuyo id sea cocheId, del concesionarios pasado por id
+// Obtener el coche cuyo id sea cocheId, del concesionario pasado por id
 app.get("/concesionarios/:id/coches/:cocheId", (request, response) => {
   const id = request.params.id;
-  const concesionarioConcreto = concesionarios[id];
-
   const cocheId = request.params.cocheId;
-  const coches = concesionarioConcreto.coches.split(",").map((coches) => coches.trim());
 
-  const result = coches[cocheId];
+  concesionariosSchema
+    .findById(id)
+    .then((concesionario) => {
+      const cochesArray = concesionario.coches.split(",").map((coche) => coche.trim());
 
-  response.json({ result });
+      const coche = cochesArray[cocheId];
+      response.json({ coche });
+    })
+    .catch((error) => response.json({ message: error }));
 });
 
-// Actualiza el coche cuyo id sea cocheId, del concesionarios pasado por id
+// Actualizar el coche cuyo id sea cocheId, del concesionario pasado por id
 app.put("/concesionarios/:id/coches/:cocheId", (request, response) => {
   const id = request.params.id;
-  const concesionarioConcreto = concesionarios[id];
-
   const cocheId = request.params.cocheId;
-  const coches = concesionarioConcreto.coches.split(",").map((coches) => coches.trim());
+  const { coches } = request.body;
 
-  coches[cocheId] = request.body.coches;
-  concesionarioConcreto.coches = coches.join(", ");
+  concesionariosSchema
+    .findById(id)
+    .then((concesionario) => {
+      const cochesArray = concesionario.coches.split(",").map((coche) => coche.trim());
+      cochesArray[cocheId] = coches;
 
-  response.json({ message: "ok" });
+      // Actualizar la propiedad 'coches' con el array modificado
+      concesionario.coches = cochesArray.join(", ");
+
+      return concesionario.save();
+    })
+    .then((data) => response.json(data))
+    .catch((error) => response.json({ message: error }));
 });
 
-// Borra el coche cuyo id sea cocheId, del concesionarios pasado por id
+// Borrar el coche cuyo id sea cocheId, del concesionario pasado por id
 app.delete("/concesionarios/:id/coches/:cocheId", (request, response) => {
   const id = request.params.id;
-  const concesionarioConcreto = concesionarios[id];
-
   const cocheId = request.params.cocheId;
-  const coches = concesionarioConcreto.coches.split(",").map((coches) => coches.trim());
 
-  coches.splice(cocheId, 1);
-  concesionarioConcreto.coches = coches.join(", ");
+  concesionariosSchema
+    .findById(id)
+    .then((concesionario) => {
+      const cochesArray = concesionario.coches.split(",").map((coche) => coche.trim());
 
-  response.json({ message: "ok" });
+      // Eliminar el coche específico del array
+      cochesArray.splice(cocheId, 1);
+
+      // Actualizar la propiedad 'coches' con el array modificado
+      concesionario.coches = cochesArray.join(", ");
+
+      return concesionario.save();
+    })
+    .then((data) => response.json(data))
+    .catch((error) => response.json({ message: error }));
 });
