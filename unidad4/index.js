@@ -12,12 +12,15 @@ const mongoose = require("mongoose");
 
 const dataBase = require("./dataBase");
 const concesionarioColletion = require("./models/concesionarios");
+const swaggerUi = require("swagger-ui-express");
+const swaggerDocument = require("./swagger.json");
 
 // Inicializamos la aplicación
 const app = express();
 
 //  Indicamos que la aplicación puede escribir JSON (API Rest)
 app.use(express.json());
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 // Indicamos el puerto en el que vamos a desplegar la aplicación
 const port = process.env.PORT || 8080;
@@ -32,20 +35,20 @@ app.listen(port, () => {
 dataBase();
 /**let concesionarios = [
   {
-    nombre: "Hyunday Motor",
-    direccion: "C/ locos Nº4",
-    coches: "Toyota Camry, Ford Mustang ,BMW X5, Honda Civic",
+    "nombre": "Hyunday Motor",
+    "direccion": "C/ locos Nº4",
+    "coches": "Toyota Camry, Ford Mustang ,BMW X5, Honda Civic"
   },
   {
-    nombre: "Malaga Motor",
-    direccion: "Calle Pepito 14 Poligono Industrial Malaga",
-    coches: "Tesla Model, Audi Q5, Ford F-150, Mercedes-Benz E-Class",
+    "nombre": "Malaga Motor",
+    "direccion": "Calle Pepito 14 Poligono Industrial Malaga",
+    "coches": "Tesla Model, Audi Q5, Ford F-150, Mercedes-Benz E-Class"
   },
 ];*/
 
 // Lista todos los concesionarios
 app.get("/concesionarios", (request, response) => {
-  concesionariosSchema
+  concesionarioColletion
     .find()
     .then((data) => response.json(data))
     .catch((error) => response.json({ message: error }));
@@ -53,7 +56,7 @@ app.get("/concesionarios", (request, response) => {
 
 // Añadir un nuevo concesionarios
 app.post("/concesionarios", (request, response) => {
-  const concesionario = concesionariosSchema(request.body);
+  const concesionario = concesionarioColletion(request.body);
   concesionario
     .save()
     .then((data) => response.json(data))
@@ -63,7 +66,7 @@ app.post("/concesionarios", (request, response) => {
 // Obtener un solo concesionarios
 app.get("/concesionarios/:id", (request, response) => {
   const id = request.params.id;
-  concesionariosSchema
+  concesionarioColletion
     .findById(id)
     .then((data) => response.json(data))
     .catch((error) => response.json({ message: error }));
@@ -73,7 +76,7 @@ app.get("/concesionarios/:id", (request, response) => {
 app.put("/concesionarios/:id", (request, response) => {
   const id = request.params.id;
   const { nombre, direccion, coches } = request.body;
-  concesionariosSchema
+  concesionarioColletion
     .updateOne({ _id: id }, { $set: { nombre, direccion, coches } })
     .then((data) => response.json(data))
     .catch((error) => response.json({ message: error }));
@@ -82,7 +85,7 @@ app.put("/concesionarios/:id", (request, response) => {
 // Borrar un elemento del array
 app.delete("/concesionarios/:id", (request, response) => {
   const id = request.params.id;
-  concesionariosSchema
+  concesionarioColletion
     .deleteOne({ _id: id })
     .then((data) => response.json(data))
     .catch((error) => response.json({ message: error }));
@@ -92,7 +95,7 @@ app.delete("/concesionarios/:id", (request, response) => {
 app.get("/concesionarios/:id/coches", (request, response) => {
   const id = request.params.id;
 
-  concesionariosSchema
+  concesionarioColletion
     .findById(id)
     .then((concesionario) => {
       response.json({ coches: concesionario.coches });
@@ -105,7 +108,7 @@ app.post("/concesionarios/:id/coches", (request, response) => {
   const id = request.params.id;
   const { coches: cochesToAdd } = request.body;
 
-  concesionariosSchema
+  concesionarioColletion
     .findById(id)
     .then((concesionario) => {
       if (!concesionario) {
@@ -132,7 +135,7 @@ app.get("/concesionarios/:id/coches/:cocheId", (request, response) => {
   const id = request.params.id;
   const cocheId = request.params.cocheId;
 
-  concesionariosSchema
+  concesionarioColletion
     .findById(id)
     .then((concesionario) => {
       const cochesArray = concesionario.coches.split(",").map((coche) => coche.trim());
@@ -149,7 +152,7 @@ app.put("/concesionarios/:id/coches/:cocheId", (request, response) => {
   const cocheId = request.params.cocheId;
   const { coches } = request.body;
 
-  concesionariosSchema
+  concesionarioColletion
     .findById(id)
     .then((concesionario) => {
       const cochesArray = concesionario.coches.split(",").map((coche) => coche.trim());
@@ -169,7 +172,7 @@ app.delete("/concesionarios/:id/coches/:cocheId", (request, response) => {
   const id = request.params.id;
   const cocheId = request.params.cocheId;
 
-  concesionariosSchema
+  concesionarioColletion
     .findById(id)
     .then((concesionario) => {
       const cochesArray = concesionario.coches.split(",").map((coche) => coche.trim());
