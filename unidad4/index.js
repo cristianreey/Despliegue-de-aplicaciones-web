@@ -15,7 +15,7 @@ const express = require("express");
 const mongoose = require("mongoose");
 
 const dataBase = require("./dataBase");
-const concesionarioColletion = require("./models/concesionarios");
+const reeveCollection = require("./models/reeve");
 const swaggerUi = require("swagger-ui-express");
 const swaggerDocument = require("./swagger.json");
 
@@ -38,191 +38,178 @@ app.listen(port, () => {
 // (temporal hasta incorporar una base de datos)
 dataBase();
 
-/*let concesionarios = [
+//EXAMEN
+
+/*let reeve = [
 {
-    "nombre": "Hyunday Motor",
-    "direccion": "C/ locos Nº4",
-    "coches": [
+    "origen": "C/feo nº2",
+    "destino": "C/ locos Nº4",
+    "numero de paradas": "4",
+
+    "tanetes": [
         {
-            "marca": "Toyota",
-            "modelo": "Camry"
+            "hora": "12:00",
+            "cantidad": "5"
         },
         {
-            "marca": "Ford",
-            "modelo": "Mustang"
+             "hora": "14:00",
+            "cantidad": "5"
         },
         {
-            "marca": "BMW",
-            "modelo": "X5"
+            "hora": "16:00",
+            "cantidad": "6"
         },
         {
-            "marca": "Audi",
-            "modelo": "RS7"
+            "hora": "12:00",
+            "cantidad": "9"
         }
     ]
-  },
-   {
-    "nombre": "Malaga Motor",
-    "direccion": "Calle Pepito 14 Poligono Industrial Malaga",
-    "coches": [
-      {
-        "marca": "BMW",
-        "modelo": "Serie M5 Competition"
-      },
-      {
-        "marca": "Mercedes",
-        "modelo": "AMG"
-      },
-      {
-        "marca": "Honda",
-        "modelo": "Civic"
-      }
-    ],
-  }
-];*/
+  } */
 
-// Lista todos los concesionarios
-app.get("/concesionarios", (request, response) => {
-  concesionariosSchema
+//EXAMEN
+
+//lista todos los reeve
+app.get("/reeve", (request, response) => {
+  reeveCollection
     .find()
     .then((data) => response.json(data))
     .catch((error) => response.json({ message: error }));
 });
 
-// Añadir un nuevo concesionarios
-app.post("/concesionarios", (request, response) => {
-  const concesionario = concesionariosSchema(request.body);
-  concesionario
+// Añadir un nuevo reeve
+app.post("/reeve", (request, response) => {
+  const reeve = reeveCollection(request.body);
+  reeve
     .save()
     .then((data) => response.json(data))
     .catch((error) => response.json({ message: error }));
 });
 
-// Obtener un solo concesionarios
-app.get("/concesionarios/:id", (request, response) => {
+// Obtener un solo reeve
+app.get("/reeve/:id", (request, response) => {
   const id = request.params.id;
-  concesionariosSchema
+  reeveCollection
     .findById(id)
     .then((data) => response.json(data))
     .catch((error) => response.json({ message: error }));
 });
 
-// Actualizar un solo concesionarios
-app.put("/concesionarios/:id", (request, response) => {
+// Actualizar un solo reeve
+app.put("/reeve/:id", (request, response) => {
   const id = request.params.id;
-  const { nombre, direccion, coches } = request.body;
-  concesionariosSchema
-    .updateOne({ _id: id }, { $set: { nombre, direccion, coches } })
+  const { origen, destino, numeroParadas, tanetes } = request.body;
+  reeveCollection
+    .updateOne({ _id: id }, { $set: { origen, destino, numeroParadas, tanetes } })
     .then((data) => response.json(data))
     .catch((error) => response.json({ message: error }));
 });
 
 // Borrar un elemento del array
-app.delete("/concesionarios/:id", (request, response) => {
+app.delete("/reeve/:id", (request, response) => {
   const id = request.params.id;
-  concesionariosSchema
+  reeveCollection
     .deleteOne({ _id: id })
     .then((data) => response.json(data))
     .catch((error) => response.json({ message: error }));
 });
 
-// Obtener todos los coches de un concesionarios por id
-app.get("/concesionarios/:id/coches", (request, response) => {
+// Obtener todos los tanetes de un concesionarios por id
+app.get("/reeve/:id/tanetes", (request, response) => {
   const id = request.params.id;
 
-  concesionariosSchema
+  reeveCollection
     .findById(id)
-    .then((concesionario) => {
-      response.json({ coches: concesionario.coches });
+    .then((reeve) => {
+      response.json({ tanetes: reeve.tanetes });
     })
     .catch((error) => response.json({ message: error }));
 });
 
-// Añadir un nuevo coche al concesionario
-app.post("/concesionarios/:id/coches", (request, response) => {
+// Añadir un nuevo tanete al concesionario
+app.post("/reeve/:id/tanetes", (request, response) => {
   const id = request.params.id;
-  const { marca, modelo } = request.body;
+  const { hora, cantidad } = request.body;
 
-  concesionariosSchema
+  reeveCollection
     .findById(id)
-    .then((concesionario) => {
-      if (!concesionario) {
-        return response.status(404).json({ message: "Concesionario no encontrado" });
+    .then((reeve) => {
+      if (!reeve) {
+        return response.status(404).json({ message: "Reeve no encontrado" });
       }
 
-      // Agregar el nuevo coche al array existente
-      const nuevoCoche = { marca, modelo };
-      concesionario.coches.push(nuevoCoche);
+      // Agregar el nuevo tanete al array existente
+      const nuevoTanete = { hora, cantidad };
+      reeve.tanetes.push(nuevoTanete);
 
-      return concesionario.save();
+      return reeve.save();
     })
     .then((data) => response.json(data))
     .catch((error) => response.status(500).json({ message: error }));
 });
 
-// Obtener el coche cuyo id sea cocheId, del concesionario pasado por id
-app.get("/concesionarios/:id/coches/:cocheId", (request, response) => {
+// Obtener el tanete cuyo id sea taneteId, del reeve pasado por id
+app.get("/reeve/:id/tanetes/:taneteId", (request, response) => {
   const id = request.params.id;
-  const cocheId = request.params.cocheId;
+  const taneteId = request.params.taneteId;
 
-  concesionariosSchema
+  reeveCollection
     .findById(id)
-    .then((concesionario) => {
-      if (!concesionario) {
-        return response.status(404).json({ message: "Concesionario no encontrado" });
+    .then((reeve) => {
+      if (!reeve) {
+        return response.status(404).json({ message: "Reeve no encontrado" });
       }
 
-      const coche = concesionario.coches[cocheId];
-      response.json({ coche });
+      const tanete = reeve.tanetes[taneteId];
+      response.json({ tanete });
     })
     .catch((error) => response.json({ message: error }));
 });
 
-// Actualizar el coche cuyo id sea cocheId, del concesionario pasado por id
-app.put("/concesionarios/:id/coches/:cocheId", (request, response) => {
+// Actualizar el tanete cuyo id sea taneteId, del reeve pasado por id
+app.put("/reeve/:id/tanetes/:cocheId", (request, response) => {
   const id = request.params.id;
-  const cocheId = request.params.cocheId;
-  const { marca, modelo } = request.body;
+  const taneteId = request.params.taneteId;
+  const { hora, cantidad } = request.body;
 
-  concesionariosSchema
+  reeveCollection
     .findById(id)
-    .then((concesionario) => {
-      if (!concesionario) {
-        return response.status(404).json({ message: "Concesionario no encontrado" });
+    .then((reeve) => {
+      if (!reeve) {
+        return response.status(404).json({ message: "Reeve no encontrado" });
       }
 
       // Actualizar los datos del coche en el array existente
-      concesionario.coches[cocheId] = { marca, modelo };
+      concesionario.tanetes[taneteId] = { hora, cantidad };
 
-      // Actualizar la propiedad 'coches' con el array modificado
-      return concesionario.save();
+      // Actualizar la propiedad 'tanetes' con el array modificado
+      return reeve.save();
     })
     .then((data) => response.json(data))
     .catch((error) => response.json({ message: error }));
 });
 
-// Borrar el coche cuyo id sea cocheId, del concesionario pasado por id
-app.delete("/concesionarios/:id/coches/:cocheId", (request, response) => {
+// Borrar el tanete cuyo id sea taneteId, del reeve pasado por id
+app.delete("/reeve/:id/tanetes/:taneteId", (request, response) => {
   const id = request.params.id;
-  const cocheId = request.params.cocheId;
+  const taneteId = request.params.taneteId;
 
-  concesionariosSchema
+  reeveCollection
     .findById(id)
-    .then((concesionario) => {
-      if (!concesionario) {
-        return response.status(404).json({ message: "Concesionario no encontrado" });
+    .then((reeve) => {
+      if (!reeve) {
+        return response.status(404).json({ message: "Reeve no encontrado" });
       }
 
       // Verificar si el índice es válido
-      if (cocheId < 0 || cocheId >= concesionario.coches.length) {
-        return response.status(400).json({ message: "Índice de coche no válido" });
+      if (taneteId < 0 || taneteId >= reeve.tanetes.length) {
+        return response.status(400).json({ message: "Índice de tanete no válido" });
       }
 
-      // Eliminar el coche específico del array
-      concesionario.coches.splice(cocheId, 1);
+      // Eliminar el tanete específico del array
+      reeve.tanete.splice(taneteId, 1);
 
-      // Actualizar la propiedad 'coches' con el array modificado
-      return concesionario.save();
+      // Actualizar la propiedad 'tanetes' con el array modificado
+      return reeve.save();
     })
     .then((data) => response.json(data))
     .catch((error) => response.json({ message: error }));

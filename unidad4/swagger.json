@@ -2,66 +2,69 @@
   "swagger": "2.0",
   "basePath": "/",
   "info": {
-    "title": "Concesionarios API",
-    "version": "1.0.2"
+    "title": "Reeve API",
+    "version": "1.0.3"
   },
   "definitions": {
-    "Coche": {
+    "Tanetes": {
       "type": "object",
       "properties": {
-        "marca": {
+        "hora": {
           "type": "string"
         },
-        "modelo": {
+        "cantidad": {
           "type": "string"
         }
       },
-      "required": ["marca", "modelo"]
+      "required": ["hora", "cantidad"]
     },
-    "Concesionarios": {
+    "Reeve": {
       "type": "object",
       "properties": {
-        "nombre": {
+        "origen": {
           "type": "string"
         },
-        "direccion": {
+        "destino": {
           "type": "string"
         },
-        "coches": {
+        "numeroParadas": {
+          "type": "string"
+        },
+        "tanetes": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/Coche"
+            "$ref": "#/definitions/Tanetes"
           }
         }
       },
-      "required": ["nombre", "direccion"]
+      "required": ["origen", "destino", "numeroParadas"]
     }
   },
   "paths": {
-    "/concesionarios": {
+    "/reeve": {
       "get": {
-        "summary": "Obtener todos los concesionarios.",
+        "summary": "Obtener todos los reeve.",
         "responses": {
           "200": {
-            "description": "Array with concesionarios.",
+            "description": "Array con reeve.",
             "schema": {
               "type": "array",
               "items": {
-                "$ref": "#/definitions/Concesionarios"
+                "$ref": "#/definitions/Reeve"
               }
             }
           }
         }
       },
       "post": {
-        "summary": "Crear concesionarios",
+        "summary": "Crear reeve",
         "consumes": ["application/json"],
         "parameters": [
           {
             "in": "body",
-            "name": "Concesionarios",
+            "name": "Reeve",
             "schema": {
-              "$ref": "#/definitions/Concesionarios"
+              "$ref": "#/definitions/Reeve"
             }
           }
         ],
@@ -72,9 +75,9 @@
         }
       }
     },
-    "/concesionarios/{id}": {
+    "/reeve/{id}": {
       "get": {
-        "summary": "Obtener uno Concesionarios por Id.",
+        "summary": "Obtener uno Reeve por Id.",
         "parameters": [
           {
             "in": "path",
@@ -85,15 +88,15 @@
         ],
         "responses": {
           "200": {
-            "description": "Traer un concesionario.",
+            "description": "Traer un reeve.",
             "schema": {
-              "$ref": "#/definitions/Concesionarios"
+              "$ref": "#/definitions/Reeve"
             }
           }
         }
       },
       "put": {
-        "summary": "Actualizar uno Concesionarios por Id.",
+        "summary": "Actualizar un Reeve por Id.",
         "consumes": ["application/json"],
         "parameters": [
           {
@@ -104,9 +107,9 @@
           },
           {
             "in": "body",
-            "name": "Concesionarios",
+            "name": "Reeve",
             "schema": {
-              "$ref": "#/definitions/Concesionarios"
+              "$ref": "#/definitions/Reeve"
             }
           }
         ],
@@ -117,7 +120,7 @@
         }
       },
       "delete": {
-        "summary": "Eliminar uno Concesionarios por Id.",
+        "summary": "Eliminar un Reeve por Id.",
         "parameters": [
           {
             "in": "path",
@@ -133,9 +136,9 @@
         }
       }
     },
-    "/concesionarios/{id}/coches": {
+    "/reeve/{id}/tanetes": {
       "get": {
-        "summary": "Obtener un coche para un concisionario por Id.",
+        "summary": "Obtener un tanete para un reeve por Id.",
         "parameters": [
           {
             "in": "path",
@@ -146,18 +149,18 @@
         ],
         "responses": {
           "200": {
-            "description": "Array with coches.",
+            "description": "Array con tanetes.",
             "schema": {
               "type": "array",
               "items": {
-                "$ref": "#/definitions/Concesionarios"
+                "$ref": "#/definitions/Reeve"
               }
             }
           }
         }
       },
       "post": {
-        "summary": "Crear un coche para un concisionario por Id.",
+        "summary": "Crear un tanete para un reeve por Id.",
         "consumes": ["application/json"],
         "parameters": [
           {
@@ -168,9 +171,9 @@
           },
           {
             "in": "body",
-            "name": "Coches",
+            "name": "Tanetes",
             "schema": {
-              "$ref": "#/definitions/Coche"
+              "$ref": "#/definitions/Tanete"
             }
           }
         ],
@@ -181,9 +184,9 @@
         }
       }
     },
-    "/concesionarios/{id}/coches/{idCoche}": {
+    "/reeve/{id}/tanetes/{idTanete}": {
       "get": {
-        "summary": "Obtener un coche para un concisionario por Id.",
+        "summary": "Obtener un tanete para un reeve por Id.",
         "parameters": [
           {
             "in": "path",
@@ -193,23 +196,23 @@
           },
           {
             "in": "path",
-            "name": "idCoche",
+            "name": "idTanete",
             "type": "integer",
             "required": true
           }
         ],
         "responses": {
           "200": {
-            "description": "One coche.",
+            "description": "Un tanete.",
             "schema": {
               "type": "string",
-              "$ref": "#/definitions/Coche"
+              "$ref": "#/definitions/Tanete"
             }
           }
         }
       },
       "put": {
-        "summary": "Actualizar un coche para un concisionario por Id.",
+        "summary": "Actualizar un tanete para un reeve por Id.",
         "parameters": [
           {
             "in": "path",
@@ -219,15 +222,15 @@
           },
           {
             "in": "path",
-            "name": "idCoche",
+            "name": "idTanete",
             "type": "integer",
             "required": true
           },
           {
             "in": "body",
-            "name": "Coches",
+            "name": "Tanetes",
             "schema": {
-              "$ref": "#/definitions/Coche"
+              "$ref": "#/definitions/Tanete"
             }
           }
         ],
@@ -238,7 +241,7 @@
         }
       },
       "delete": {
-        "summary": "Eliminar un coche para un concisionario por Id.",
+        "summary": "Eliminar un tanete para un reeve por Id.",
         "parameters": [
           {
             "in": "path",
@@ -248,7 +251,7 @@
           },
           {
             "in": "path",
-            "name": "idCoche",
+            "name": "idTanete",
             "type": "integer",
             "required": true
           }
