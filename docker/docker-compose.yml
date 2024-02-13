@@ -1,0 +1,40 @@
+# Cree un volumen
+# Cree una red, con la subnet 172.100.0.0/16
+# Cree un contenedor, basado en la imagen de ubuntu:22.04
+# Se cree de forma interativa  (-i -t)
+# Tenga la red creada anteriormente
+# Tenga la ip 172.100.0.10
+# Mapee el puerto 8080 de mi maquina al 80 de adentro
+# Tenga el volumen creado anteriormente en la carpeta /app/data
+# Quiero que tenga el nombre de mi-daw-12
+# docker-compose up -d
+#  docker-compose down
+
+version: "3"
+services:
+  mi-daw-12:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: mi-daw-12
+    networks:
+      mi-red:
+        ipv4_address: 172.100.0.10
+    ports:
+      - "8080:80"
+    volumes:
+      - mi-volumen:/app/data
+
+    tty: true
+    stdin_open: true
+
+networks:
+  mi-red:
+    name: mi-red1
+    ipam:
+      driver: default
+      config:
+        - subnet: "172.100.0.0/16"
+
+volumes:
+  mi-volumen:
