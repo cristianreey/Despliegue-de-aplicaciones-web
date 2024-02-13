@@ -1,7 +1,7 @@
 services:
   mi-mongo:
     image: mongo
-    container_name: mi-mongo
+    container_name: mi-mongo1
     volumes:
       - mi-volumen:/data/db
     networks:
@@ -11,9 +11,9 @@ services:
 
   mi-mongo-express:
     image: mongo-express
-    container_name: mi-mongo-express
+    container_name: mi-mongo-express1
     environment:
-      - ME_CONFIG_MONGODB_SERVER=mi-mongo
+      - ME_CONFIG_MONGODB_SERVER=mi-mongo1
     ports:
       - "8081:8081"
     networks:
