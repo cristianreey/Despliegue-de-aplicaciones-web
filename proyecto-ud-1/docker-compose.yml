@@ -1,0 +1,43 @@
+version: "3"
+
+services:
+  mi-mongo:
+    image: mongo
+    volumes:
+      - mongo-vol:/data/db
+    networks:
+      mongo-node-net:
+        ipv4_address: 172.40.0.10
+
+  mi-node:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    networks:
+      mongo-node-net:
+        ipv4_address: 172.40.0.11
+
+  mi-nginx:
+    image: nginx
+    ports:
+      - "80:80"
+    networks:
+      - node-nginx-net
+    depends_on:
+      - mi-node
+
+networks:
+  mongo-node-net:
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.40.0.0/16
+
+  node-nginx-net:
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.80.0.0/16
+
+volumes:
+  mongo-vol:
