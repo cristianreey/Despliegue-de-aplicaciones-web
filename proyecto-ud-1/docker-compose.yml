@@ -1,43 +1,46 @@
-version: "3"
+version: "3" # Versión de la sintaxis de Docker Compose que se está utilizando
 
-services:
+services: # Definición de los servicios que se ejecutarán en contenedores Docker
+  # Servicio mi-mongo
   mi-mongo:
-    image: mongo
-    volumes:
-      - mongo-vol:/data/db
-    networks:
-      mongo-node-net:
-        ipv4_address: 172.40.0.10
+    image: mongo # Imagen base utilizada para este servicio (MongoDB)
+    volumes: # Volumen utilizado para persistir los datos de MongoDB
+      - mongo-vol:/data/db # Se monta el volumen llamado "mongo-vol" en el directorio /data/db del contenedor
+    networks: # Configuración de redes para el servicio
+      mongo-node-net: # Nombre de la red a la que se conectará este servicio
+        ipv4_address: 172.40.0.10 # Dirección IP específica asignada a este contenedor en la red
 
+  # Servicio mi-node
   mi-node:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    networks:
-      mongo-node-net:
-        ipv4_address: 172.40.0.11
+    build: # Configuración para construir la imagen del contenedor a partir de un Dockerfile local
+      context: . # Directorio de contexto para buscar el Dockerfile local (en el directorio actual)
+      dockerfile: Dockerfile # Nombre del Dockerfile a utilizar
+    networks: # Configuración de redes para el servicio
+      mongo-node-net: # Nombre de la red a la que se conectará este servicio
+        ipv4_address: 172.40.0.11 # Dirección IP específica asignada a este contenedor en la red
 
+  # Servicio mi-nginx
   mi-nginx:
-    image: nginx
-    ports:
-      - "80:80"
-    networks:
-      - node-nginx-net
-    depends_on:
-      - mi-node
+    image: nginx # Imagen base utilizada para este servicio (NGINX)
+    ports: # Mapeo de puertos entre el host y el contenedor
+      - "80:80" # Se mapea el puerto 80 del host al puerto 80 del contenedor
+    networks: # Configuración de redes para el servicio
+      - node-nginx-net # Nombre de la red a la que se conectará este servicio
+    depends_on: # Dependencia de otros servicios
+      - mi-node # Este servicio depende del servicio "mi-node" para funcionar correctamente
 
-networks:
-  mongo-node-net:
-    ipam:
-      driver: default
-      config:
-        - subnet: 172.40.0.0/16
+networks: # Definición de las redes personalizadas utilizadas por los servicios
+  mongo-node-net: # Nombre de la red personalizada utilizada por los servicios mi-mongo y mi-node
+    ipam: # Configuración de IP Address Management (IPAM) para la red
+      driver: default # Controlador IPAM utilizado (predeterminado)
+      config: # Configuración específica de la subred para IPAM
+        - subnet: 172.40.0.0/16 # Subred utilizada para la red (172.40.0.0 - 172.40.255.255)
 
-  node-nginx-net:
-    ipam:
-      driver: default
-      config:
-        - subnet: 172.80.0.0/16
+  node-nginx-net: # Nombre de la red personalizada utilizada por el servicio mi-nginx
+    ipam: # Configuración de IPAM para la red
+      driver: default # Controlador IPAM utilizado (predeterminado)
+      config: # Configuración específica de la subred para IPAM
+        - subnet: 172.80.0.0/16 # Subred utilizada para la red (172.80.0.0 - 172.80.255.255)
 
-volumes:
-  mongo-vol:
+volumes: # Definición de volúmenes utilizados por los servicios
+  mongo-vol: # Nombre del volumen utilizado por el servicio mi-mongo
