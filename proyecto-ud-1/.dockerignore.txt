@@ -1,0 +1,5 @@
+#ignora todos los archivos terminados en .log
+.log 
+
+# ignora la carpeta node-modules
+node_modules/
